@@ -611,7 +611,7 @@ top_level = true
 script = ExtResource("2_uu6xs")
 
 [node name="Camera3D" type="Camera3D" parent="Player/CameraPivot" unique_id=646411434]
-transform = Transform3D(1, 0, 0, 0, 0.9848077, 0.17364818, 0, -0.17364818, 0.9848077, 0, 1.5, 4)
+transform = Transform3D(0.9986295, 0, -0.052336, -0.0045614, 0.9961947, -0.0870363, 0.0521369, 0.0871557, 0.9948285, 0.85, 1.2, 2.8)
 current = true
 
 [node name="FrontMarker" type="MeshInstance3D" parent="Player" unique_id=1066230041]
