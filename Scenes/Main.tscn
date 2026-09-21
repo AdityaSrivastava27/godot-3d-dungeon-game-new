@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://ctx551w8kh256" path="res://Scripts/player.gd" id="1_glv2v"]
 [ext_resource type="Script" uid="uid://bl8ey8rgmbcmb" path="res://Scripts/camera.gd" id="2_uu6xs"]
 [ext_resource type="Script" uid="uid://djo272vdkdncr" path="res://Scripts/door.gd" id="4_door"]
+[ext_resource type="Script" path="res://Scripts/gun.gd" id="5_gun"]
+[ext_resource type="Script" path="res://Scripts/hud.gd" id="6_hud"]
 
 [sub_resource type="Environment" id="env_castle"]
 background_mode = 1
@@ -60,6 +62,20 @@ height = 1.8
 albedo_color = Color(0, 0, 0, 1)
 
 [sub_resource type="BoxMesh" id="mesh_marker"]
+
+[sub_resource type="StandardMaterial3D" id="mat_gun"]
+albedo_color = Color(0.16, 0.16, 0.18, 1)
+metallic = 0.7
+roughness = 0.35
+
+[sub_resource type="BoxMesh" id="mesh_gun_body"]
+size = Vector3(0.11, 0.17, 0.3)
+
+[sub_resource type="BoxMesh" id="mesh_gun_grip"]
+size = Vector3(0.09, 0.22, 0.12)
+
+[sub_resource type="BoxMesh" id="mesh_gun_barrel"]
+size = Vector3(0.07, 0.07, 0.4)
 
 [node name="Main" type="Node3D" unique_id=1397884888]
 
@@ -618,3 +634,63 @@ current = true
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0.75, 0.3)
 material_override = SubResource("mat_marker")
 mesh = SubResource("mesh_marker")
+
+[node name="Gun" type="Node3D" parent="Player" unique_id=1900100001 groups=["gun"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, 0.25, 0.3)
+script = ExtResource("5_gun")
+
+[node name="Body" type="MeshInstance3D" parent="Player/Gun" unique_id=1900100002]
+material_override = SubResource("mat_gun")
+mesh = SubResource("mesh_gun_body")
+
+[node name="Grip" type="MeshInstance3D" parent="Player/Gun" unique_id=1900100003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.16, -0.07)
+material_override = SubResource("mat_gun")
+mesh = SubResource("mesh_gun_grip")
+
+[node name="Barrel" type="MeshInstance3D" parent="Player/Gun" unique_id=1900100004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, 0.33)
+material_override = SubResource("mat_gun")
+mesh = SubResource("mesh_gun_barrel")
+
+[node name="Muzzle" type="Marker3D" parent="Player/Gun" unique_id=1900100005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, 0.55)
+
+[node name="Flash" type="OmniLight3D" parent="Player/Gun/Muzzle" unique_id=1900100006]
+visible = false
+light_color = Color(1, 0.84, 0.5, 1)
+light_energy = 6.0
+omni_range = 4.0
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1900100007]
+script = ExtResource("6_hud")
+
+[node name="AmmoLabel" type="Label" parent="HUD" unique_id=1900100008]
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 380.0
+offset_bottom = 130.0
+theme_override_colors/font_color = Color(1, 0.93, 0.75, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "Bullets  6 / 6\nMagazines  4"
+
+[node name="Crosshair" type="Label" parent="HUD" unique_id=1900100009]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -10.0
+offset_top = -16.0
+offset_right = 10.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.75)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 26
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
