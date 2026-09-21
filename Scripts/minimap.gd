@@ -109,10 +109,16 @@ func _footprint(box: CSGBox3D, min_thickness: float = 0.0) -> PackedVector2Array
 
 
 ## World x/z to a point on the map, in the player's frame: their facing is up.
+##
+## The player faces +Z, not Godot's usual -Z: their yaw is taken from the
+## camera's basis.z as they move (see Player._physics_process), so forward is
+## (sin, cos). Facing that way puts their right hand towards -x, which is why
+## the sideways axis is (-cos, sin) rather than the (cos, -sin) a -Z facing
+## would give -- with the latter the map came out mirrored left to right.
 func _to_map(world: Vector2) -> Vector2:
 	var rel := world - _origin
 	var ahead := rel.x * _sin + rel.y * _cos
-	var beside := rel.x * _cos - rel.y * _sin
+	var beside := rel.y * _sin - rel.x * _cos
 	return _centre + Vector2(beside, -ahead) * _scale
 
 
