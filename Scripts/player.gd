@@ -1,9 +1,50 @@
 extends CharacterBody3D
 
+## Player movement, and the health the enemies whittle down.
+##
+## Health is a plain 0..MAX_HEALTH count so the damage figures read as the
+## percentages the design asks for: a ranged hit costs 20, a melee hit 50.
+## Running out sends the player back to where they started at full health --
+## there is nothing else to do with a death yet.
+
+signal health_changed(current: int, maximum: int)
+signal died
+
+const MAX_HEALTH := 100
 
 const SPEED = 5.0
 const ROTATION_SPEED = 10.0
 const JUMP_VELOCITY = 4.5
+
+var health: int = MAX_HEALTH
+
+var _spawn_point: Vector3
+
+
+func _ready() -> void:
+	_spawn_point = global_position
+
+
+## Takes `amount` off the player's health, stopping at zero. Ignored once the
+## player is already down, so two hits landing on the same frame cannot push
+## the count negative.
+func take_damage(amount: int) -> void:
+	if health <= 0 or amount <= 0:
+		return
+
+	health = maxi(health - amount, 0)
+	health_changed.emit(health, MAX_HEALTH)
+
+	if health == 0:
+		died.emit()
+		_respawn()
+
+
+func _respawn() -> void:
+	global_position = _spawn_point
+	velocity = Vector3.ZERO
+	health = MAX_HEALTH
+	health_changed.emit(health, MAX_HEALTH)
 
 
 func _physics_process(delta: float) -> void:

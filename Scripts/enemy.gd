@@ -21,18 +21,38 @@ extends CharacterBody3D
 @export var sight_range: float = 14.0
 @export var sight_angle: float = 60.0   # half-angle of the vision cone, degrees
 
+## Damage a hit takes off the player, as a percentage of full health.
+@export var ranged_damage: int = 20
+@export var melee_damage: int = 50
+
+## Inside this distance the guard swings instead of shooting.
+@export var melee_range: float = 2.2
+
 const CHASE_MULTIPLIER := 1.5
 const TURN_SPEED := 8.0
 const WAYPOINT_RADIUS := 0.6   # close enough to count as having arrived
 const EYE_HEIGHT := 0.6        # above the body's centre
 const MEMORY_TIME := 1.5       # seconds of pursuit after the player breaks sight
+const SHOT_INTERVAL := 1.5     # seconds between shots
+const MELEE_INTERVAL := 1.2    # seconds between swings
+const FLASH_TIME := 0.05       # how long the muzzle light stays lit
 
 var chasing: bool = false      # read by the tests and anything watching the guard
 
 var _waypoint: int = 0
 var _memory: float = 0.0
+var _sees_player: bool = false
+var _shot_timer: float = 0.0
+var _melee_timer: float = 0.0
 
 @onready var _player: CharacterBody3D = get_tree().get_first_node_in_group("player")
+@onready var _muzzle: Marker3D = $Gun/Muzzle
+@onready var _flash: OmniLight3D = $Gun/Muzzle/Flash
+
+
+func _ready() -> void:
+	if _flash != null:
+		_flash.visible = false
 
 
 func _physics_process(delta: float) -> void:
@@ -40,6 +60,7 @@ func _physics_process(delta: float) -> void:
 		velocity += get_gravity() * delta
 
 	chasing = _update_awareness(delta)
+	_fight(delta)
 
 	var target := _player.global_position if chasing else _current_waypoint()
 	var to_target := target - global_position
@@ -72,7 +93,8 @@ func _update_awareness(delta: float) -> bool:
 	if _player == null:
 		return false
 
-	if can_see_player():
+	_sees_player = can_see_player()
+	if _sees_player:
 		_memory = MEMORY_TIME
 		return true
 
@@ -119,3 +141,54 @@ func _current_waypoint() -> Vector3:
 	_waypoint = _waypoint % patrol_points.size()
 	var p := patrol_points[_waypoint]
 	return Vector3(p.x, global_position.y, p.z)
+
+
+## Swing when the player is within reach, otherwise shoot at them. Both
+## weapons are on their own cooldown, and neither fires while the guard has
+## not found the player.
+func _fight(delta: float) -> void:
+	_shot_timer = maxf(_shot_timer - delta, 0.0)
+	_melee_timer = maxf(_melee_timer - delta, 0.0)
+
+	if _player == null or not chasing:
+		return
+
+	var gap := Vector2(_player.global_position.x - global_position.x,
+		_player.global_position.z - global_position.z).length()
+
+	if gap <= melee_range:
+		if _melee_timer <= 0.0:
+			_melee_timer = MELEE_INTERVAL
+			_player.take_damage(melee_damage)
+	elif _sees_player and _shot_timer <= 0.0:
+		_shot_timer = SHOT_INTERVAL
+		_fire_at_player()
+
+
+# A shot only lands if the muzzle has a clear line of its own; the guard can
+# be pursuing from memory with a wall in the way, and those shots should miss.
+func _fire_at_player() -> void:
+	_show_flash()
+
+	var from: Vector3 = _muzzle.global_position if _muzzle != null else global_position
+	var query := PhysicsRayQueryParameters3D.create(from, _player.global_position)
+	query.collision_mask = 1
+	query.collide_with_areas = false
+	query.exclude = [get_rid()]
+
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if not hit.is_empty() and hit.collider == _player:
+		_player.take_damage(ranged_damage)
+
+
+func _show_flash() -> void:
+	if _flash == null:
+		return
+
+	_flash.visible = true
+	get_tree().create_timer(FLASH_TIME).timeout.connect(_hide_flash)
+
+
+func _hide_flash() -> void:
+	if _flash != null:
+		_flash.visible = false

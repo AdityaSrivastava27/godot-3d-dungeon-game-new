@@ -87,6 +87,25 @@ emission_enabled = true
 emission = Color(1, 0.7, 0.2, 1)
 emission_energy_multiplier = 3.0
 
+[sub_resource type="StandardMaterial3D" id="mat_enemy_metal"]
+albedo_color = Color(0.2, 0.21, 0.24, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="mat_enemy_blade"]
+albedo_color = Color(0.75, 0.78, 0.82, 1)
+metallic = 0.9
+roughness = 0.15
+
+[sub_resource type="BoxMesh" id="mesh_enemy_gun"]
+size = Vector3(0.1, 0.12, 0.45)
+
+[sub_resource type="BoxMesh" id="mesh_enemy_blade"]
+size = Vector3(0.07, 0.12, 0.75)
+
+[sub_resource type="BoxMesh" id="mesh_enemy_hilt"]
+size = Vector3(0.09, 0.09, 0.16)
+
 [node name="Main" type="Node3D" unique_id=1397884888]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2143580184]
@@ -706,6 +725,36 @@ text = "+"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="HealthBar" type="ColorRect" parent="HUD" unique_id=1900400001]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -64.0
+offset_right = 324.0
+offset_bottom = -32.0
+grow_vertical = 0
+color = Color(0.08, 0.08, 0.09, 0.72)
+
+[node name="Fill" type="ColorRect" parent="HUD/HealthBar" unique_id=1900400002]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = -3.0
+offset_bottom = -3.0
+color = Color(0.32, 0.68, 0.3, 1)
+
+[node name="HealthLabel" type="Label" parent="HUD/HealthBar" unique_id=1900400003]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 18
+text = "Health  100%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Enemy_R2" type="CharacterBody3D" parent="." unique_id=1900200001 groups=["enemy"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1, -12)
 collision_layer = 2
@@ -724,6 +773,34 @@ mesh = SubResource("mesh_player_cap")
 transform = Transform3D(0.18, 0, 0, 0, 0.18, 0, 0, 0, 0.18, 0, 0.5, 0.36)
 material_override = SubResource("mat_enemy_eye")
 mesh = SubResource("mesh_marker")
+
+[node name="Gun" type="Node3D" parent="Enemy_R2" unique_id=1900300021]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, 0.18, 0.2)
+
+[node name="Barrel" type="MeshInstance3D" parent="Enemy_R2/Gun" unique_id=1900300022]
+material_override = SubResource("mat_enemy_metal")
+mesh = SubResource("mesh_enemy_gun")
+
+[node name="Muzzle" type="Marker3D" parent="Enemy_R2/Gun" unique_id=1900300023]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.3)
+
+[node name="Flash" type="OmniLight3D" parent="Enemy_R2/Gun/Muzzle" unique_id=1900300024]
+visible = false
+light_color = Color(1, 0.78, 0.45, 1)
+light_energy = 5.0
+omni_range = 3.5
+
+[node name="Blade" type="Node3D" parent="Enemy_R2" unique_id=1900300025]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.42, 0.05, 0.2)
+
+[node name="Edge" type="MeshInstance3D" parent="Enemy_R2/Blade" unique_id=1900300026]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.38)
+material_override = SubResource("mat_enemy_blade")
+mesh = SubResource("mesh_enemy_blade")
+
+[node name="Hilt" type="MeshInstance3D" parent="Enemy_R2/Blade" unique_id=1900300027]
+material_override = SubResource("mat_enemy_metal")
+mesh = SubResource("mesh_enemy_hilt")
 
 [node name="Enemy_R4" type="CharacterBody3D" parent="." unique_id=1900200005 groups=["enemy"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.5, 1, -11.5)
@@ -744,6 +821,34 @@ transform = Transform3D(0.18, 0, 0, 0, 0.18, 0, 0, 0, 0.18, 0, 0.5, 0.36)
 material_override = SubResource("mat_enemy_eye")
 mesh = SubResource("mesh_marker")
 
+[node name="Gun" type="Node3D" parent="Enemy_R4" unique_id=1900300041]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, 0.18, 0.2)
+
+[node name="Barrel" type="MeshInstance3D" parent="Enemy_R4/Gun" unique_id=1900300042]
+material_override = SubResource("mat_enemy_metal")
+mesh = SubResource("mesh_enemy_gun")
+
+[node name="Muzzle" type="Marker3D" parent="Enemy_R4/Gun" unique_id=1900300043]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.3)
+
+[node name="Flash" type="OmniLight3D" parent="Enemy_R4/Gun/Muzzle" unique_id=1900300044]
+visible = false
+light_color = Color(1, 0.78, 0.45, 1)
+light_energy = 5.0
+omni_range = 3.5
+
+[node name="Blade" type="Node3D" parent="Enemy_R4" unique_id=1900300045]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.42, 0.05, 0.2)
+
+[node name="Edge" type="MeshInstance3D" parent="Enemy_R4/Blade" unique_id=1900300046]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.38)
+material_override = SubResource("mat_enemy_blade")
+mesh = SubResource("mesh_enemy_blade")
+
+[node name="Hilt" type="MeshInstance3D" parent="Enemy_R4/Blade" unique_id=1900300047]
+material_override = SubResource("mat_enemy_metal")
+mesh = SubResource("mesh_enemy_hilt")
+
 [node name="Enemy_R3" type="CharacterBody3D" parent="." unique_id=1900200009 groups=["enemy"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1, -41)
 collision_layer = 2
@@ -762,3 +867,31 @@ mesh = SubResource("mesh_player_cap")
 transform = Transform3D(0.18, 0, 0, 0, 0.18, 0, 0, 0, 0.18, 0, 0.5, 0.36)
 material_override = SubResource("mat_enemy_eye")
 mesh = SubResource("mesh_marker")
+
+[node name="Gun" type="Node3D" parent="Enemy_R3" unique_id=1900300061]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, 0.18, 0.2)
+
+[node name="Barrel" type="MeshInstance3D" parent="Enemy_R3/Gun" unique_id=1900300062]
+material_override = SubResource("mat_enemy_metal")
+mesh = SubResource("mesh_enemy_gun")
+
+[node name="Muzzle" type="Marker3D" parent="Enemy_R3/Gun" unique_id=1900300063]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.3)
+
+[node name="Flash" type="OmniLight3D" parent="Enemy_R3/Gun/Muzzle" unique_id=1900300064]
+visible = false
+light_color = Color(1, 0.78, 0.45, 1)
+light_energy = 5.0
+omni_range = 3.5
+
+[node name="Blade" type="Node3D" parent="Enemy_R3" unique_id=1900300065]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.42, 0.05, 0.2)
+
+[node name="Edge" type="MeshInstance3D" parent="Enemy_R3/Blade" unique_id=1900300066]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.38)
+material_override = SubResource("mat_enemy_blade")
+mesh = SubResource("mesh_enemy_blade")
+
+[node name="Hilt" type="MeshInstance3D" parent="Enemy_R3/Blade" unique_id=1900300067]
+material_override = SubResource("mat_enemy_metal")
+mesh = SubResource("mesh_enemy_hilt")
