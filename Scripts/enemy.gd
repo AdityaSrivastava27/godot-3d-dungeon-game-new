@@ -38,8 +38,13 @@ const MEMORY_TIME := 1.5       # seconds of pursuit after the player breaks sigh
 const SHOT_INTERVAL := 1.5     # seconds between shots
 const MELEE_INTERVAL := 1.2    # seconds between swings
 const FLASH_TIME := 0.05       # how long the muzzle light stays lit
+const MAX_HEALTH := 100        # two of the player's bullets, at 50 each
+
+## Emitted just before the guard is removed, for anything keeping score.
+signal killed
 
 var chasing: bool = false      # read by the tests and anything watching the guard
+var health: int = MAX_HEALTH
 
 var _waypoint: int = 0
 var _memory: float = 0.0
@@ -211,3 +216,15 @@ func touching_player() -> bool:
 	var gap := Vector2(_player.global_position.x - global_position.x,
 		_player.global_position.z - global_position.z).length()
 	return gap <= contact_reach
+
+
+## Takes a hit from the player. At zero the guard drops out of the level --
+## there is no corpse or respawn to manage yet.
+func take_damage(amount: int) -> void:
+	if health <= 0 or amount <= 0:
+		return
+
+	health = maxi(health - amount, 0)
+	if health == 0:
+		killed.emit()
+		queue_free()
