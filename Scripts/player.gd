@@ -1,3 +1,4 @@
+class_name Player
 extends CharacterBody3D
 
 ## Player movement, and the health the enemies whittle down.
@@ -7,7 +8,13 @@ extends CharacterBody3D
 ## Running out sends the player back to where they started at full health --
 ## there is nothing else to do with a death yet.
 
+## What hit the player. The HUD shows a different effect for each, so being
+## shot at reads differently from being cut down.
+enum DamageSource { RANGED, MELEE }
+
 signal health_changed(current: int, maximum: int)
+## Carries what did the damage, not just how much.
+signal damaged(amount: int, source: DamageSource)
 signal died
 
 const MAX_HEALTH := 100
@@ -28,11 +35,12 @@ func _ready() -> void:
 ## Takes `amount` off the player's health, stopping at zero. Ignored once the
 ## player is already down, so two hits landing on the same frame cannot push
 ## the count negative.
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, source: DamageSource = DamageSource.RANGED) -> void:
 	if health <= 0 or amount <= 0:
 		return
 
 	health = maxi(health - amount, 0)
+	damaged.emit(amount, source)
 	health_changed.emit(health, MAX_HEALTH)
 
 	if health == 0:

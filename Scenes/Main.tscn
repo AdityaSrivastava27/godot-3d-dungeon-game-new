@@ -695,6 +695,47 @@ omni_range = 4.0
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1900100007]
 script = ExtResource("6_hud")
 
+[node name="HitFlash" type="ColorRect" parent="HUD" unique_id=1900500001]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.72, 0.25, 0.28)
+
+[node name="SlashMarks" type="Control" parent="HUD" unique_id=1900500002]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Cut1" type="ColorRect" parent="HUD/SlashMarks" unique_id=1900500003]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -520.0
+offset_top = -170.0
+offset_right = 520.0
+offset_bottom = -152.0
+rotation = -0.42
+mouse_filter = 2
+color = Color(0.85, 0.07, 0.05, 0.85)
+
+[node name="Cut2" type="ColorRect" parent="HUD/SlashMarks" unique_id=1900500004]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -520.0
+offset_top = 96.0
+offset_right = 520.0
+offset_bottom = 108.0
+rotation = -0.42
+mouse_filter = 2
+color = Color(0.72, 0.05, 0.04, 0.7)
+
 [node name="AmmoLabel" type="Label" parent="HUD" unique_id=1900100008]
 offset_left = 24.0
 offset_top = 20.0
@@ -733,6 +774,7 @@ offset_top = -64.0
 offset_right = 324.0
 offset_bottom = -32.0
 grow_vertical = 0
+mouse_filter = 2
 color = Color(0.08, 0.08, 0.09, 0.72)
 
 [node name="Fill" type="ColorRect" parent="HUD/HealthBar" unique_id=1900400002]
@@ -742,6 +784,7 @@ offset_left = 3.0
 offset_top = 3.0
 offset_right = -3.0
 offset_bottom = -3.0
+mouse_filter = 2
 color = Color(0.32, 0.68, 0.3, 1)
 
 [node name="HealthLabel" type="Label" parent="HUD/HealthBar" unique_id=1900400003]
@@ -752,6 +795,25 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 18
 text = "Health  100%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HitLabel" type="Label" parent="HUD" unique_id=1900500005]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -120.0
+offset_right = 200.0
+offset_bottom = -78.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.93, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0.25, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 30
+text = "SHOT  -20%"
 horizontal_alignment = 1
 vertical_alignment = 1
 

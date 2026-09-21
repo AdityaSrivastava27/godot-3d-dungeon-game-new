@@ -25,8 +25,10 @@ extends CharacterBody3D
 @export var ranged_damage: int = 20
 @export var melee_damage: int = 50
 
-## Inside this distance the guard swings instead of shooting.
-@export var melee_range: float = 2.2
+## The blade only lands when the two bodies are actually touching. Capsules of
+## radius 0.4 cannot get closer than 0.8 m centre to centre, so this is contact
+## plus a little tolerance rather than a swing through thin air.
+@export var contact_reach: float = 0.9
 
 const CHASE_MULTIPLIER := 1.5
 const TURN_SPEED := 8.0
@@ -143,9 +145,9 @@ func _current_waypoint() -> Vector3:
 	return Vector3(p.x, global_position.y, p.z)
 
 
-## Swing when the player is within reach, otherwise shoot at them. Both
-## weapons are on their own cooldown, and neither fires while the guard has
-## not found the player.
+## Swing when the guard is actually touching the player, otherwise shoot at
+## them. Both weapons are on their own cooldown, and neither is used while the
+## guard has not found the player.
 func _fight(delta: float) -> void:
 	_shot_timer = maxf(_shot_timer - delta, 0.0)
 	_melee_timer = maxf(_melee_timer - delta, 0.0)
@@ -153,13 +155,10 @@ func _fight(delta: float) -> void:
 	if _player == null or not chasing:
 		return
 
-	var gap := Vector2(_player.global_position.x - global_position.x,
-		_player.global_position.z - global_position.z).length()
-
-	if gap <= melee_range:
+	if touching_player():
 		if _melee_timer <= 0.0:
 			_melee_timer = MELEE_INTERVAL
-			_player.take_damage(melee_damage)
+			_player.take_damage(melee_damage, Player.DamageSource.MELEE)
 	elif _sees_player and _shot_timer <= 0.0:
 		_shot_timer = SHOT_INTERVAL
 		_fire_at_player()
@@ -178,7 +177,7 @@ func _fire_at_player() -> void:
 
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
 	if not hit.is_empty() and hit.collider == _player:
-		_player.take_damage(ranged_damage)
+		_player.take_damage(ranged_damage, Player.DamageSource.RANGED)
 
 
 func _show_flash() -> void:
@@ -192,3 +191,23 @@ func _show_flash() -> void:
 func _hide_flash() -> void:
 	if _flash != null:
 		_flash.visible = false
+
+
+## True when the guard and the player are in contact.
+##
+## A guard that walked into the player reports the touch from its own last
+## move, which is a frame old and close enough at these speeds. The player walking into a guard that is
+## standing still shows up on the player's own move instead, not here, so fall
+## back to the gap between them -- at contact_reach the capsules are already
+## pressed together.
+func touching_player() -> bool:
+	if _player == null:
+		return false
+
+	for i in get_slide_collision_count():
+		if get_slide_collision(i).get_collider() == _player:
+			return true
+
+	var gap := Vector2(_player.global_position.x - global_position.x,
+		_player.global_position.z - global_position.z).length()
+	return gap <= contact_reach
