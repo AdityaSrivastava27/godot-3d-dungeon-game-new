@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://djo272vdkdncr" path="res://Scripts/door.gd" id="4_door"]
 [ext_resource type="Script" path="res://Scripts/gun.gd" id="5_gun"]
 [ext_resource type="Script" path="res://Scripts/hud.gd" id="6_hud"]
+[ext_resource type="Script" path="res://Scripts/enemy.gd" id="7_enemy"]
 
 [sub_resource type="Environment" id="env_castle"]
 background_mode = 1
@@ -76,6 +77,15 @@ size = Vector3(0.09, 0.22, 0.12)
 
 [sub_resource type="BoxMesh" id="mesh_gun_barrel"]
 size = Vector3(0.07, 0.07, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="mat_enemy"]
+albedo_color = Color(0.72, 0.18, 0.16, 1)
+
+[sub_resource type="StandardMaterial3D" id="mat_enemy_eye"]
+albedo_color = Color(1, 0.85, 0.3, 1)
+emission_enabled = true
+emission = Color(1, 0.7, 0.2, 1)
+emission_energy_multiplier = 3.0
 
 [node name="Main" type="Node3D" unique_id=1397884888]
 
@@ -612,6 +622,7 @@ omni_attenuation = 1.5
 
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1736208171 groups=["player"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 12)
+collision_mask = 3
 script = ExtResource("1_glv2v")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=12491522]
@@ -694,3 +705,60 @@ theme_override_font_sizes/font_size = 26
 text = "+"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Enemy_R2" type="CharacterBody3D" parent="." unique_id=1900200001 groups=["enemy"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1, -12)
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("7_enemy")
+patrol_points = PackedVector3Array(-8, 0, -12, 8, 0, -12, 8, 0, -24, -8, 0, -24)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy_R2" unique_id=1900200002]
+shape = SubResource("shape_player_cap")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Enemy_R2" unique_id=1900200003]
+material_override = SubResource("mat_enemy")
+mesh = SubResource("mesh_player_cap")
+
+[node name="Eye" type="MeshInstance3D" parent="Enemy_R2" unique_id=1900200004]
+transform = Transform3D(0.18, 0, 0, 0, 0.18, 0, 0, 0, 0.18, 0, 0.5, 0.36)
+material_override = SubResource("mat_enemy_eye")
+mesh = SubResource("mesh_marker")
+
+[node name="Enemy_R4" type="CharacterBody3D" parent="." unique_id=1900200005 groups=["enemy"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.5, 1, -11.5)
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("7_enemy")
+patrol_points = PackedVector3Array(-29.5, 0, -11.5, -17.5, 0, -11.5, -17.5, 0, -22.5, -29.5, 0, -22.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy_R4" unique_id=1900200006]
+shape = SubResource("shape_player_cap")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Enemy_R4" unique_id=1900200007]
+material_override = SubResource("mat_enemy")
+mesh = SubResource("mesh_player_cap")
+
+[node name="Eye" type="MeshInstance3D" parent="Enemy_R4" unique_id=1900200008]
+transform = Transform3D(0.18, 0, 0, 0, 0.18, 0, 0, 0, 0.18, 0, 0.5, 0.36)
+material_override = SubResource("mat_enemy_eye")
+mesh = SubResource("mesh_marker")
+
+[node name="Enemy_R3" type="CharacterBody3D" parent="." unique_id=1900200009 groups=["enemy"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1, -41)
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("7_enemy")
+patrol_points = PackedVector3Array(-6, 0, -41, 6, 0, -41, 6, 0, -47, -6, 0, -47)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy_R3" unique_id=1900200010]
+shape = SubResource("shape_player_cap")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Enemy_R3" unique_id=1900200011]
+material_override = SubResource("mat_enemy")
+mesh = SubResource("mesh_player_cap")
+
+[node name="Eye" type="MeshInstance3D" parent="Enemy_R3" unique_id=1900200012]
+transform = Transform3D(0.18, 0, 0, 0, 0.18, 0, 0, 0, 0.18, 0, 0.5, 0.36)
+material_override = SubResource("mat_enemy_eye")
+mesh = SubResource("mesh_marker")
